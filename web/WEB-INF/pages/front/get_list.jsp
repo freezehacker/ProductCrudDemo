@@ -67,6 +67,7 @@
         </c:choose>
     </div>
 
+    <%@include file="page_footer.jsp"%>
 </div>
 </body>
 </html>

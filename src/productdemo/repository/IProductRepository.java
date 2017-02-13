@@ -23,4 +23,8 @@ public interface IProductRepository {
     //
 
     List<Product> search(String name);
+
+    List<Product> select(int pageSize, int pageIndex);
+
+    int countAll();
 }

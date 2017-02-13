@@ -24,7 +24,6 @@ import java.util.List;
 public class ProductItemsController extends HttpServlet {
 
     private static Logger logger = Logger.getLogger(ProductItemsController.class);
-
     private IProductService productService = new ProductServiceImpl();
 
 
@@ -32,20 +31,6 @@ public class ProductItemsController extends HttpServlet {
         request.setCharacterEncoding("utf-8");
 
         String method = request.getParameter("method");
-        if ("SEARCH".equals(method)) {
-            processSearch(request, response);
-        } else {
-            // to be continued
-        }
-    }
 
-    private void processSearch(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String name = request.getParameter("name");
-        if (name == null) return;
-
-        List<Product> products = productService.searchProductsByName(name);
-        //logger.debug("结果: " + products);
-        request.setAttribute("productList", products);
-        ServletUtils.forward(request, response, "/WEB-INF/pages/front/search_items.jsp");
     }
 }

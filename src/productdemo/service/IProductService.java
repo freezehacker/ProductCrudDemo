@@ -20,4 +20,8 @@ public interface IProductService {
     void modifyProduct(Product product);    // 实际上也是根据id来辨识
 
     List<Product> searchProductsByName(String name);
+
+    List<Product> getProducts(int pageSize, int pageIndex);  // 分页
+
+    int countAllProducts();
 }

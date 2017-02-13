@@ -1,7 +1,9 @@
 package productdemo.UI;
 
 import productdemo.bean.Category;
+import productdemo.bean.Pager;
 import productdemo.bean.Product;
+import productdemo.constant.PagerConst;
 import productdemo.service.ICategoryService;
 import productdemo.service.IProductService;
 import productdemo.service.impl.CategoryServiceImpl;
@@ -28,13 +30,48 @@ public class ProductListUIController extends HttpServlet {
     private IProductService productService = new ProductServiceImpl();
     //private ICategoryService categoryService = new CategoryServiceImpl();
 
+    /**
+     * （默认）分页
+     * @param request
+     * @param response
+     * @throws ServletException
+     * @throws IOException
+     */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("utf-8");
 
-        // 商品列表
-        List<Product> productList = productService.getAllProducts();
-        request.setAttribute("productList", productList);
+        String pageIndex = request.getParameter("pageIndex");
+        String pageSize = request.getParameter("pageSize");
 
+        int size, index;
+
+        if (pageSize == null) {
+            size = PagerConst.PAGE_SIZE;
+        } else {
+            size = Integer.valueOf(pageSize);
+        }
+
+        if (pageIndex == null) {
+            index = PagerConst.PAGE_INDEX;
+        } else {
+            index = Integer.valueOf(pageIndex);
+        }
+
+        Pager<Product> pager = new Pager<>();
+
+        int recordCount = productService.countAllProducts();
+        int pageCount = recordCount % size == 0 ? recordCount / size : recordCount / size + 1;
+        pager.setPageCount(pageCount);
+        pager.setPageIndex(index);
+        pager.setPageSize(size);
+        pager.setUrl();
+
+        List<Product> products = productService.getProducts(size, index);
+        pager.setRecordList(products);
+
+
+
+        request.setAttribute("pager", pager);
         ServletUtils.forward(request, response, "/WEB-INF/pages/front/get_list.jsp");
     }
 }

@@ -23,11 +23,10 @@
 
 <div class="row">
     <div class="col-md-4 col-md-offset-4">
-        <form action="/doItems" method="POST" class="form-horizontal">
-            <input type="hidden" name="method" value="SEARCH">
+        <form action="/items" method="GET" class="form-horizontal">
             <input type="text" name="name" class="form-control">
             <button type="submit"
-                    class="glyphicon glyphicon-search"><%--<span class="glyphicon glyphicon-search"></span>--%></button>
+                    class="glyphicon glyphicon-search"></button>
         </form>
     </div>
 </div>

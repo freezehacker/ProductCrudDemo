@@ -2,12 +2,14 @@ package productdemo.repository.impl;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
+import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.apache.log4j.Logger;
 import productdemo.bean.Category;
 import productdemo.bean.Product;
 import productdemo.repository.IProductRepository;
 import productdemo.utils.DBUtils;
 
+import javax.xml.transform.Result;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -101,20 +103,7 @@ public class ProductRepositoryImpl implements IProductRepository {
             return queryRunner.query(sql, new ResultSetHandler<List<Product>>() {
                 @Override
                 public List<Product> handle(ResultSet resultSet) throws SQLException {
-                    List<Product> ret = new ArrayList<>();
-                    while (resultSet.next()) {
-                        Product product = new Product();
-                        product.setName(resultSet.getString("prod_name"));
-                        product.setAmount(resultSet.getInt("prod_amount"));
-                        product.setPrice(resultSet.getFloat("prod_price"));
-                        product.setId(resultSet.getInt("prod_id"));
-                        Category category = new Category();
-                        category.setId(resultSet.getInt("cat_id"));
-                        category.setName(resultSet.getString("cat_name"));
-                        product.setCategory(category);
-                        ret.add(product);
-                    }
-                    return ret;
+                    return fromResultSet(resultSet);
                 }
             });
         } catch (SQLException sqle) {
@@ -136,26 +125,63 @@ public class ProductRepositoryImpl implements IProductRepository {
                     new ResultSetHandler<List<Product>>() {
                         @Override
                         public List<Product> handle(ResultSet resultSet) throws SQLException {
-                            List<Product> products = new ArrayList<>();
-                            while (resultSet.next()) {
-                                Product product = new Product();
-                                product.setName(resultSet.getString("prod_name"));
-                                product.setAmount(resultSet.getInt("prod_amount"));
-                                product.setPrice(resultSet.getFloat("prod_price"));
-                                product.setId(resultSet.getInt("prod_id"));
-                                Category category = new Category();
-                                category.setId(resultSet.getInt("cat_id"));
-                                category.setName(resultSet.getString("cat_name"));
-                                product.setCategory(category);
-                                products.add(product);
-                            }
-                            return products;
+                            return fromResultSet(resultSet);
                         }
                     },
                     "%" + name + "%");
         } catch (SQLException sqle) {
             logger.error(sqle);
             return null;
+        }
+    }
+
+    @Override
+    public List<Product> select(int pageSize, int pageIndex) {
+        final String SQL = "SELECT * " +
+                "FROM `Product` P INNER JOIN `Category` C ON P.`prod_category`=C.`cat_id` " +
+                "LIMIT ? OFFSET ?";
+        try {
+            QueryRunner runner = new QueryRunner(DBUtils.getDataSource());
+            int offset = pageIndex * pageSize;
+            return runner.query(SQL, new ResultSetHandler<List<Product>>() {
+                @Override
+                public List<Product> handle(ResultSet rs) throws SQLException {
+                    return fromResultSet(rs);
+                }
+            }, pageSize, offset);
+        } catch (SQLException sqle) {
+            logger.error(sqle);
+            return null;
+        }
+    }
+
+    // 重复的代码
+    private List<Product> fromResultSet(ResultSet resultSet) throws SQLException {
+        List<Product> products = new ArrayList<>();
+        while (resultSet.next()) {
+            Product product = new Product();
+            product.setName(resultSet.getString("prod_name"));
+            product.setAmount(resultSet.getInt("prod_amount"));
+            product.setPrice(resultSet.getFloat("prod_price"));
+            product.setId(resultSet.getInt("prod_id"));
+            Category category = new Category();
+            category.setId(resultSet.getInt("cat_id"));
+            category.setName(resultSet.getString("cat_name"));
+            product.setCategory(category);
+            products.add(product);
+        }
+        return products;
+    }
+
+    @Override
+    public int countAll() {
+        QueryRunner runner = new QueryRunner(DBUtils.getDataSource());
+        final String SQL = "SELECT COUNT(*) FROM `Product`";
+        try {
+            return runner.query(SQL, new ScalarHandler<Integer>(1));
+        } catch (SQLException sqle) {
+            logger.error(sqle);
+            return -1;
         }
     }
 }

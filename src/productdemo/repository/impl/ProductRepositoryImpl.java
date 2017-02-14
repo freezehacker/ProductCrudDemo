@@ -178,7 +178,8 @@ public class ProductRepositoryImpl implements IProductRepository {
         QueryRunner runner = new QueryRunner(DBUtils.getDataSource());
         final String SQL = "SELECT COUNT(*) FROM `Product`";
         try {
-            return runner.query(SQL, new ScalarHandler<Integer>(1));
+            Number number = runner.query(SQL, new ScalarHandler<Integer>(1));
+            return number.intValue();
         } catch (SQLException sqle) {
             logger.error(sqle);
             return -1;

@@ -24,10 +24,10 @@
 
     <div class="col-md-6 col-md-offset-3">
         <c:choose>
-            <c:when test="${productList != null && productList.size() != 0}">
+            <c:when test="${pager.recordList != null && pager.recordList.size() != 0}">
                 <table class="table table-striped table-hover">
                     <tbody>
-                    <c:forEach items="${productList}" var="product">
+                    <c:forEach items="${pager.recordList}" var="product">
                         <tr>
                             <td>${product.id}</td>
                             <td>${product.name}</td>
@@ -67,7 +67,9 @@
         </c:choose>
     </div>
 
-    <%@include file="page_footer.jsp"%>
+    <div class="col-md-6 col-md-offset-3">
+        <%@include file="page_footer.jsp"%>
+    </div>
 </div>
 </body>
 </html>

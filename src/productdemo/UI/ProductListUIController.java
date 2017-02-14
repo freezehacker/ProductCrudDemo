@@ -64,7 +64,8 @@ public class ProductListUIController extends HttpServlet {
         pager.setPageCount(pageCount);
         pager.setPageIndex(index);
         pager.setPageSize(size);
-        pager.setUrl();
+
+        pager.setUrl(request.getRequestURL().toString());
 
         List<Product> products = productService.getProducts(size, index);
         pager.setRecordList(products);
